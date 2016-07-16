@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from blueprints import test
+import test
 
 app = Flask(__name__)
 
