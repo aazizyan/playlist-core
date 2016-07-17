@@ -1,3 +1,6 @@
 import os
 
-DATABASE_URL = os.environ('DATABASE_URL', None)
+
+DATABASE_URL = os.environ.get('DATABASE_URL', None)
+
+DATABASE_CONNECTION = 'DATABASE_CONNECTION'
