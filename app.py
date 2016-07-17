@@ -2,10 +2,12 @@ import os
 
 from flask import Flask
 
-from blueprints import test
+from blueprints import user_api, admin_api
 
 app = Flask(__name__)
-app.register_blueprint(test)
+
+app.register_blueprint(user_api)
+app.register_blueprint(admin_api)
 
 
 @app.route('/ping')
