@@ -23,7 +23,7 @@ CREATE TABLE songs(
 	user_id INT NOT NULL,
 	song_name varchar(50),
 	FOREIGN KEY (place_id) REFERENCES places(place_id),
-	FOREIGN KEY (user_id) REFERENCES users(user_id)
+	FOREIGN KEY (user_id) REFERENCES users(user_id),
 );
 
 CREATE TABLE likes(
@@ -31,5 +31,6 @@ CREATE TABLE likes(
 	user_id INT NOT NULL,
 	song_id INT NOT NULL,
 	type BOOLEAN NOT NULL DEFAULT TRUE,
-	FOREIGN KEY (user_id) REFERENCES users(user_id)
+	FOREIGN KEY (user_id) REFERENCES users(user_id),
+	FOREIGN KEY (song_id) REFERENCES songs(song_id)
 );
