@@ -80,3 +80,13 @@ def remove_song(connection, song_id):
     return True
 
 
+def enter_place(connection, username, placeid):
+    pass
+
+
+def change_song_name(connection, place_id, user_id, song_name, new_name):
+    pass
+
+
+def get_songs(connection, place_id):
+    pass
