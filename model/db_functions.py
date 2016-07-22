@@ -35,11 +35,11 @@ def add_place(connection, admin_id, place_name, latitude, longtitude):
     return True
 
 
-def add_song(connection, place_id, user_id, song_name):
+def add_song(connection, place_id, username, song_name):
     cursor = connection.cursor()
 
-    cursor.execute("""INSERT INTO songs (place_id, user_id, song_name) VALUES (%s, %s, %s);""",
-                   (place_id, user_id, song_name))
+    cursor.execute("""INSERT INTO songs (place_id, username, song_name) VALUES (%s, %s, %s);""",
+                   (place_id, username, song_name))
     if cursor.rowcount == 0:
         return False
     connection.commit()

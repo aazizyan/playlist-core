@@ -4,7 +4,7 @@ CREATE TABLE users(
 	password varchar(64) NOT NULL,
 	name varchar(30) NOT NULL,
 	is_admin BOOLEAN NOT NULL DEFAULT FALSE,
-	token CHAR(30),
+	token CHAR(32),
 	token_date REAL DEFAULT EXTRACT(EPOCH FROM now())
 );
 
@@ -20,10 +20,10 @@ CREATE TABLE places(
 CREATE TABLE songs(
 	song_id SERIAL PRIMARY KEY,
 	place_id INT NOT NULL,
-	user_id INT NOT NULL,
+	username varchar(50) NOT NULL UNIQUE,
 	song_name varchar(50),
 	FOREIGN KEY (place_id) REFERENCES places(place_id),
-	FOREIGN KEY (user_id) REFERENCES users(user_id)
+	FOREIGN KEY (username) REFERENCES users(username)
 );
 
 CREATE TABLE likes(
