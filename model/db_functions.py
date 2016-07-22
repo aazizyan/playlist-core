@@ -1,5 +1,4 @@
 import uuid
-
 import psycopg2
 
 
@@ -15,6 +14,17 @@ def add_user(connection, username, password, name, is_admin):
         return None
     connection.commit()
     return token
+
+
+def get_user(connection, username):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT *
+                            FROM users
+                            WHERE username = %s;""",
+                   (username,))
+    if cursor.rowcount == 0:
+        return None
+    return cursor.fetchone()
 
 
 def validate_user(connection, username, password):
@@ -160,4 +170,3 @@ def get_songs(connection, place_id):
         return []
     songs_list = cursor.fetchall()
     return songs_list
-
