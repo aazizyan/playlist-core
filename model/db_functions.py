@@ -82,6 +82,7 @@ def remove_song(connection, song_id):
     connection.commit()
     return True
 
+
 def validate_token(connection, user_id, lapse_time):
     cursor = connection.cursor()
     cursor.execute("""SELECT token_date FROM users WHERE user_id = %s and EXTRACT(EPOCH FROM now()) - %s <= token_date""",
@@ -92,6 +93,7 @@ def validate_token(connection, user_id, lapse_time):
         connection.commit()
         return True
     return False
+
 
 def update_token(connection, user_id):
     cursor = connection.cursor()
@@ -109,7 +111,4 @@ def change_song_name(connection, place_id, user_id, song_name, new_name):
 
 
 def get_songs(connection, place_id):
-    
-
     pass
-
