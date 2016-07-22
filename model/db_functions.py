@@ -1,6 +1,5 @@
 import uuid
 
-
 def add_user(connection, username, password, name, is_admin):
     cursor = connection.cursor()
     try:
@@ -121,8 +120,6 @@ def change_song_name(connection, song_id, new_name):
 
 
 def get_songs(connection, place_id):
-    pass
-
     cursor = connection.cursor()
     cursor.execute("""SELECT * FROM songs WHERE place_id = %s""",
         (place_id,))
