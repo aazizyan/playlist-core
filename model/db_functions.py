@@ -38,7 +38,7 @@ def add_place(connection, admin_username, place_name, latitude, longtitude):
                         VALUES (%s, %s, %s, %s);""",
                    (admin_username, place_name, latitude, longtitude))
     if cursor.rowcount == 0:
-        return False
+        return None
     cursor.execute("""SELECT currval('places_place_id_seq')""")
     place_id = cursor.fetchone()[0]
     connection.commit()
@@ -146,7 +146,7 @@ def change_song_name(connection, song_id, new_name):
     cursor.execute("""UPDATE songs
                         SET song_name = %s
                         WHERE song_id = %s""",
-                    (new_name, song_id))
+                   (new_name, song_id))
     connection.commit()
 
 

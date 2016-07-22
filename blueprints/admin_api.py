@@ -1,7 +1,9 @@
 from flask import Blueprint, request, current_app
 
-from model.db_functions import add_song, change_song_name, remove_song
+from model.db_functions import add_song, change_song_name, remove_song, validate_token
 from model.internal_config import DATABASE_CONNECTION
+from model.utils import LEASE_TIME
+from objects.builder_dict import BuilderDict
 from objects.json_object import JsonObject
 
 admin_api = Blueprint('admin', __name__,
@@ -21,8 +23,12 @@ def new_song(place_id):
     """
     connection = get_connection()
     song = JsonObject(request.data.decode())
-    if add_song(connection, place_id, song.username, song.songid):
-        return '', 200
+    if not validate_token(connection, song.username, LEASE_TIME):
+        return BuilderDict.create_update_lease()
+    song_id = add_song(connection, place_id, song.username, song.songid)
+    if song_id:
+        response = BuilderDict()
+        return response.add('id', str(song_id)).to_string(), 200
     return '', 404
 
 
@@ -33,11 +39,12 @@ def change_song(place_id):
     :param place_id: unique place id
     :return: status
     """
-    # TODO check validity
+
     connection = get_connection()
     song = JsonObject(request.data.decode())
-    if change_song_name(connection, place_id, song.username,
-                        song.songid, song.newname):
+    if not validate_token(connection, song.username, LEASE_TIME):
+        return BuilderDict.create_update_lease()
+    if change_song_name(connection, place_id, song.username):
         return '', 200
     return '', 404
 
@@ -52,6 +59,8 @@ def delete_song(place_id):
     # TODO check validity
     connection = get_connection()
     song = JsonObject(request.data.decode())
+    if not validate_token(connection, song.username, LEASE_TIME):
+        return BuilderDict.create_update_lease()
     if remove_song(connection, song.songid):
         return '', 200
     return '', 404

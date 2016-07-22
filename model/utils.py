@@ -1,6 +1,9 @@
 from hashlib import sha256
 
 
+LEASE_TIME = 4800
+
+
 def hash_password(username, password):
     """
     Hashes username and password
