@@ -15,7 +15,8 @@ user_api = Blueprint('user', __name__,
 
 def response_token(token):
     response = BuilderDict()
-    return response.add('token', token).to_string()
+    return response.add('token', token)
+
 
 
 def get_connection():
@@ -34,11 +35,15 @@ def create_user():
     token = add_user(connection, username, password,
                      user.name, user.admin)
     if token:
+        response = response_token(token)
         if user.admin:
-            if not add_place(connection, user.username,
-                             user.place, user.lat, user.lon):
+            place_id = add_place(connection, user.username,
+                             user.place, user.lat, user.lon)
+            if place_id is None:
                 return '', 404
-        return response_token(token), 200
+            response.add('id', place_id)
+            return response.to_string(), 200
+        return response.to_string(), 200
     return '', 404
 
 
@@ -53,7 +58,7 @@ def get_user():
     password = hash_password(username, user.password)
     if validate_user(connection, username, password):
         token = update_token(connection, user.username)
-        return response_token(token), 200
+        return response_token(token).to_string(), 200
     return '', 404
 
 

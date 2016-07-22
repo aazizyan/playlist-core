@@ -26,7 +26,7 @@ def new_song(place_id):
     if not validate_token(connection, song.username, LEASE_TIME):
         return BuilderDict.create_update_lease()
     song_id = add_song(connection, place_id, song.username, song.songid)
-    if song_id:
+    if song_id is not None:
         response = BuilderDict()
         return response.add('id', str(song_id)).to_string(), 200
     return '', 404
