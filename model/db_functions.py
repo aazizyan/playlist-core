@@ -104,12 +104,16 @@ def enter_place(connection, username, placeid):
     pass
 
 
-def change_song_name(connection, place_id, user_id, song_name, new_name):
-    pass
+def change_song_name(connection, song_id, new_name):
+    cursor = connection.cursor()
+    cursor.execute("""UPDATE songs SET song_name = %s WHERE song_id = %s""",
+        (new_name, song_id))
+    connection.commit()
 
 
 def get_songs(connection, place_id):
-    
-
-    pass
-
+    cursor = connection.cursor()
+    cursor.execute("""SELECT * FROM songs WHERE place_id = %s""",
+        (place_id,))
+    songs_list = cursor.fetchall()
+    return songs_list
