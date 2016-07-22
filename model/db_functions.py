@@ -1,8 +1,11 @@
-def add_user(connection, username, password, name, is_admin, token):
+import uuid
+
+
+def add_user(connection, username, password, name, is_admin):
     cursor = connection.cursor()
     try:
         cursor.execute("""INSERT INTO users (username, password, name, is_admin, token) VALUES (%s, %s, %s, %s, %s);""",
-                       (username, password, name, is_admin, token))
+                       (username, password, name, is_admin, uuid.uuid1().hex))
     except:
         return False
     connection.commit()
@@ -79,14 +82,19 @@ def remove_song(connection, song_id):
     connection.commit()
     return True
 
+def validate_token(connection, user_id, lapse_time):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT token_date FROM users WHERE user_id = %s and EXTRACT(EPOCH FROM now()) - %s <= token_date""",
+                   (user_id, lapse_time))
+    if cursor.rowcount == 1:
+        cursor.execute("""UPDATE users SET token_date = EXTRACT(EPOCH FROM now()) WHERE user_id = %s""",
+            (user_id,))
+        connection.commit()
+        return True
+    return False
 
-def enter_place(connection, username, placeid):
-    pass
-
-
-def change_song_name(connection, place_id, user_id, song_name, new_name):
-    pass
-
-
-def get_songs(connection, place_id):
-    pass
+def update_token(connection, user_id):
+    cursor = connection.cursor()
+    cursor.execute("""UPDATE users SET token = %s WHERE user_id = %s""",
+        (uuid.uuid1().hex, user_id))
+    connection.commit()
