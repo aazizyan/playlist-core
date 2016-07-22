@@ -160,3 +160,4 @@ def get_songs(connection, place_id):
         return []
     songs_list = cursor.fetchall()
     return songs_list
+
