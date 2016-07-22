@@ -25,7 +25,7 @@ def create_user():
     username = user.username
     password = hash_password(username, user.password)
     if add_user(connection, username, password,
-                user.name, user.admin, ''):
+                user.name, user.admin):
         if user.admin and add_place(connection, user.username,
                                     user.place, user.lat, user.lon):
             return '', 200
