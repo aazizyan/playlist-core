@@ -109,5 +109,7 @@ def change_song_name(connection, place_id, user_id, song_name, new_name):
 
 
 def get_songs(connection, place_id):
+    
+
     pass
 
