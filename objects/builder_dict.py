@@ -11,3 +11,9 @@ class BuilderDict:
 
     def to_string(self):
         return json.dumps(self._dict)
+
+    @staticmethod
+    def create_update_lease():
+        response = BuilderDict()
+        response.add('status', 'not valid token')
+        return response.to_string()

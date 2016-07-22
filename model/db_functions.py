@@ -111,7 +111,7 @@ def validate_token(connection, user_id, lapse_time):
                         FROM users
                         WHERE user_id = %s and
                               EXTRACT(EPOCH FROM now()) - %s <= token_date""",
-                    (user_id, lapse_time))
+                   (user_id, lapse_time))
     if cursor.rowcount == 1:
         cursor.execute("""UPDATE users
                             SET token_date = EXTRACT(EPOCH FROM now())
@@ -142,7 +142,7 @@ def change_song_name(connection, song_id, new_name):
     cursor.execute("""UPDATE songs
                         SET song_name = %s
                         WHERE song_id = %s""",
-                    (new_name, song_id))
+                   (new_name, song_id))
     connection.commit()
 
 
@@ -151,6 +151,6 @@ def get_songs(connection, place_id):
     cursor.execute("""SELECT *
                         FROM songs
                         WHERE place_id = %s""",
-                    (place_id,))
+                   (place_id,))
     songs_list = cursor.fetchall()
     return songs_list
