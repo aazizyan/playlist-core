@@ -30,17 +30,19 @@ def validate_user(connection, username, password):
     return row[0] == password
 
 
-def add_place(connection, admin_id, place_name, latitude, longtitude):
+def add_place(connection, admin_username, place_name, latitude, longtitude):
     cursor = connection.cursor()
 
     cursor.execute("""INSERT
-                        INTO places (user_id, place_name, latitude, longitude)
+                        INTO places (username, place_name, latitude, longitude)
                         VALUES (%s, %s, %s, %s);""",
-                   (admin_id, place_name, latitude, longtitude))
+                   (admin_username, place_name, latitude, longtitude))
     if cursor.rowcount == 0:
         return False
+    cursor.execute("""SELECT currval('places_place_id_seq')""")
+    place_id = cursor.fetchone()[0]
     connection.commit()
-    return True
+    return place_id
 
 
 def add_song(connection, place_id, username, song_name):
@@ -51,18 +53,20 @@ def add_song(connection, place_id, username, song_name):
                         VALUES (%s, %s, %s);""",
                    (place_id, username, song_name))
     if cursor.rowcount == 0:
-        return False
+        return None
+    cursor.execute("""SELECT currval('songs_song_id_seq')""")
+    song_id = cursor.fetchone()[0]
     connection.commit()
-    return True
+    return song_id
 
 
-def like_song(connection, user_id, song_id, _type):
+def like_song(connection, username, song_id, _type):
     cursor = connection.cursor()
     cursor.execute("""SELECT *
                         FROM likes
-                        WHERE   user_id = %s and
+                        WHERE   username = %s and
                                 song_id = %s""",
-                   (user_id, song_id))
+                   (username, song_id))
 
     if cursor.rowcount > 0:
         like = cursor.fetchone()
@@ -71,16 +75,16 @@ def like_song(connection, user_id, song_id, _type):
         else:
             cursor.execute("""UPDATE likes
                                 SET type = %s
-                                WHERE user_id = %s and
+                                WHERE username = %s and
                                       song_id = %s""",
-                           (_type, user_id, song_id))
+                           (_type, username, song_id))
             connection.commit()
             return True
 
     cursor.execute("""INSERT
-                        INTO likes (user_id, song_id, type)
+                        INTO likes (username, song_id, type)
                         VALUES (%s, %s, %s);""",
-                   (user_id, song_id, _type))
+                   (username, song_id, _type))
     if cursor.rowcount == 0:
         return False
     connection.commit()
@@ -105,30 +109,30 @@ def remove_song(connection, song_id):
     return True
 
 
-def validate_token(connection, user_id, lapse_time):
+def validate_token(connection, username, lapse_time):
     cursor = connection.cursor()
     cursor.execute("""SELECT token_date
                         FROM users
-                        WHERE user_id = %s and
+                        WHERE username = %s and
                               EXTRACT(EPOCH FROM now()) - %s <= token_date""",
-                    (user_id, lapse_time))
+                    (username, lapse_time))
     if cursor.rowcount == 1:
         cursor.execute("""UPDATE users
                             SET token_date = EXTRACT(EPOCH FROM now())
-                            WHERE user_id = %s""",
-                       (user_id,))
+                            WHERE username = %s""",
+                       (username,))
         connection.commit()
         return True
     return False
 
 
-def update_token(connection, user_id):
+def update_token(connection, username):
     cursor = connection.cursor()
     token = uuid.uuid1().hex
     cursor.execute("""UPDATE users
                         SET token = %s
-                        WHERE user_id = %s""",
-                   (token, user_id))
+                        WHERE username = %s""",
+                   (token, username))
     connection.commit()
     return token
 
@@ -152,5 +156,7 @@ def get_songs(connection, place_id):
                         FROM songs
                         WHERE place_id = %s""",
                     (place_id,))
+    if cursor.rowcount == 0:
+        return []
     songs_list = cursor.fetchall()
     return songs_list

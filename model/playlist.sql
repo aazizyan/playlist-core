@@ -10,11 +10,11 @@ CREATE TABLE users(
 
 CREATE TABLE places(
 	place_id SERIAL PRIMARY KEY,
-	user_id INT NOT NULL,
+	username varchar(50) NOT NULL,
 	place_name varchar(100) NOT NULL,
 	latitude REAL NOT NULL,
 	longitude REAL NOT NULL,
-	FOREIGN KEY (user_id)  REFERENCES users(user_id)
+	FOREIGN KEY (username)  REFERENCES users(username)
 );
 
 CREATE TABLE songs(
@@ -28,9 +28,9 @@ CREATE TABLE songs(
 
 CREATE TABLE likes(
 	like_id SERIAL PRIMARY KEY,
-	user_id INT NOT NULL,
+	username varchar(50) NOT NULL,
 	song_id INT NOT NULL,
 	type BOOLEAN NOT NULL DEFAULT TRUE,
-	FOREIGN KEY (user_id) REFERENCES users(user_id),
+	FOREIGN KEY (username) REFERENCES users(username),
 	FOREIGN KEY (song_id) REFERENCES songs(song_id)
 );
