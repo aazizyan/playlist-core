@@ -98,3 +98,16 @@ def update_token(connection, user_id):
     cursor.execute("""UPDATE users SET token = %s WHERE user_id = %s""",
         (uuid.uuid1().hex, user_id))
     connection.commit()
+
+
+def enter_place(connection, username, placeid):
+    pass
+
+
+def change_song_name(connection, place_id, user_id, song_name, new_name):
+    pass
+
+
+def get_songs(connection, place_id):
+    pass
+
