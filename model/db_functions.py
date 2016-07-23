@@ -176,3 +176,15 @@ def get_places(connection):
                             FROM places""")
     places_list = cursor.fetchall()
     return places_list
+
+
+def validate_admin(connection, place_id, admin_username):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT *
+                        FROM places
+                        WHERE place_id = %s AND
+                              username = %s""",
+                   (place_id, admin_username))
+    if cursor.rowcount == 0:
+        return False
+    return True
