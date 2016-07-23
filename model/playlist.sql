@@ -1,7 +1,7 @@
 CREATE TABLE users(
 	user_id SERIAL PRIMARY KEY,
 	username varchar(50) NOT NULL UNIQUE,
-	password varchar(64) NOT NULL,
+	password BYTEA NOT NULL,
 	name varchar(30) NOT NULL,
 	is_admin BOOLEAN NOT NULL DEFAULT FALSE,
 	token CHAR(32),
