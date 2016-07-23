@@ -18,7 +18,6 @@ def response_token(token):
     return response.add('token', token)
 
 
-
 def get_connection():
     return current_app.config[DATABASE_CONNECTION]
 
@@ -38,10 +37,10 @@ def create_user():
         response = response_token(token)
         if user.admin:
             place_id = add_place(connection, user.username,
-                             user.place, user.lat, user.lon)
+                                 user.place, user.lat, user.lon)
             if place_id is None:
                 return '', 404
-            response.add('id', place_id)
+            response.add('id', str(place_id))
             return response.to_string(), 200
         return response.to_string(), 200
     return '', 404
@@ -78,7 +77,7 @@ def join_place(place_id):
     return '', 404
 
 
-@user_api.route('/songs>', methods=['PUT'])
+@user_api.route('/songs', methods=['PUT'])
 def send_like_song():
     """
     User likes or dislikes song in current place.
