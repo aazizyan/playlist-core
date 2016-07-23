@@ -19,6 +19,14 @@ def response_token(token):
     return response.add('token', token)
 
 
+def response_user(user_info):
+    response = BuilderDict()
+    response.add('nick', user_info[0])
+    response.add('isadmin', user_info[1])
+    response.add('placeid', str(user_info[2]))
+    return response
+
+
 def get_connection():
     return current_app.config[DATABASE_CONNECTION]
 
@@ -75,9 +83,11 @@ def get_user():
     user = JsonObject(request.data.decode())
     username = user.username
     password = hash_password(username, user.password)
-    if validate_user(connection, username, password):
+    user_info = validate_user(connection, username, password)
+    if user_info:
         token = update_token(connection, user.username)
-        return response_token(token).to_string(), 200
+        response = response_user(user_info).add('token', token).to_string()
+        return response, 200
     return '', 404
 
 
@@ -93,7 +103,7 @@ def join_place(place_id):
     user = JsonObject(request.data.decode())
     if not validate_token(connection, user.username, LEASE_TIME):
         return BuilderDict.create_update_lease()
-    if enter_place(connection, user.username, place_id):
+    if enter_place(connection, user.username, int(place_id)):
         return '', 200
     return '', 404
 
@@ -150,7 +160,7 @@ def get_list(place_id):
     :return:
     """
     connection = get_connection()
-    response = get_songs(connection, place_id)
+    response = get_songs(connection, int(place_id))
     if response:
         return json.dumps(response), 200
     return '', 404

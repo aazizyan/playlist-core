@@ -30,14 +30,15 @@ def get_user(connection, username):
 def validate_user(connection, username, password):
     cursor = connection.cursor()
 
-    cursor.execute("""SELECT password
-                        FROM users
-                        WHERE username = %s;""",
-                   (username,))
+    cursor.execute("""SELECT u.name, u.is_admin, p.place_id
+                        FROM  users as u LEFT OUTER JOIN
+                              places as p ON u.username = p.username
+                        WHERE u.username = %s AND u.password = %s;""",
+                   (username, password))
     if cursor.rowcount == 0:
-        return False
-    row = cursor.fetchone()
-    return row[0] == password
+        return None
+    user_info = cursor.fetchone()
+    return user_info
 
 
 def add_place(connection, admin_username, place_name, latitude, longtitude):
