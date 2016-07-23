@@ -82,6 +82,7 @@ def get_user():
 
 
 @user_api.route('/login/<place_id>')
+@requires_auth
 def join_place(place_id):
     """
     Lets user join requested place.
@@ -150,6 +151,20 @@ def get_list(place_id):
     """
     connection = get_connection()
     response = get_songs(connection, place_id)
+    if response:
+        return json.dumps(response), 200
+    return '', 404
+
+
+@user_api.route('/places/')
+@requires_auth
+def get_places_list():
+    """
+    Returns list of places
+    :return:
+    """
+    connection = get_connection()
+    response = get_places_list(connection)
     if response:
         return json.dumps(response), 200
     return '', 404

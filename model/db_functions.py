@@ -166,7 +166,13 @@ def get_songs(connection, place_id):
                         FROM songs
                         WHERE place_id = %s""",
                     (place_id,))
-    if cursor.rowcount == 0:
-        return []
     songs_list = cursor.fetchall()
     return songs_list
+
+
+def get_places(connection):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT *
+                            FROM places""")
+    places_list = cursor.fetchall()
+    return places_list
