@@ -1,6 +1,7 @@
 import json
 
 from flask import Blueprint, request, current_app
+from six import wraps
 
 from model.db_functions import validate_user, add_user, \
     add_place, enter_place, like_song, get_songs, update_token, validate_token
@@ -20,6 +21,25 @@ def response_token(token):
 
 def get_connection():
     return current_app.config[DATABASE_CONNECTION]
+
+
+def check_auth(username):
+    connection = get_connection()
+    return validate_token(connection, username, LEASE_TIME)
+
+
+def authenticate():
+    return '', 401
+
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        data = JsonObject(request.data.decode())
+        if not data or not check_auth(data.username):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 
 @user_api.route('/', methods=['POST'])
@@ -78,6 +98,7 @@ def join_place(place_id):
 
 
 @user_api.route('/songs', methods=['PUT'])
+@requires_auth
 def send_like_song():
     """
     User likes or dislikes song in current place.
@@ -85,14 +106,13 @@ def send_like_song():
     """
     connection = get_connection()
     like = JsonObject(request.data.decode())
-    if not validate_token(connection, like.username, LEASE_TIME):
-        return BuilderDict.create_update_lease()
     if like_song(connection, like.username, like.songid, like.like):
         return '', 200
     return '', 404
 
 
 @user_api.route('/<place_id>', methods=['POST'])
+@requires_auth
 def request_song(place_id):
     """
     User sends request to add
@@ -107,6 +127,7 @@ def request_song(place_id):
 
 
 @user_api.route('/download/<place_id>/song', methods=['GET'])
+@requires_auth
 def donwload_song(place_id):
     """
     User requests to download current playing song
@@ -120,6 +141,7 @@ def donwload_song(place_id):
 
 
 @user_api.route('/<place_id>/songs')
+@requires_auth
 def get_list(place_id):
     """
     Returns list of songs for given place id
