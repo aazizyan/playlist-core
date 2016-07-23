@@ -75,7 +75,7 @@ def create_user():
 
 
 @user_api.route('/login', methods=['POST'])
-def get_user():
+def login_user():
     """
     Checks requested username and password validity
     """
@@ -91,7 +91,20 @@ def get_user():
     return '', 404
 
 
-@user_api.route('/login/<place_id>')
+@user_api.route('/check', methods=['POST'])
+def check_validity():
+    connection = get_connection()
+    user = JsonObject(request.data.decode())
+    response = BuilderDict()
+    # TODO return with response true "nick":"nickname", "admin":"is_admin", "placeid":"id"
+    if validate_token(connection, user.username, LEASE_TIME):
+        response.add("response", True)
+    else:
+        response.add("response", False)
+    return response.to_string(), 200
+
+
+@user_api.route('/login/<place_id>', methods=['POSt'])
 @requires_auth
 def join_place(place_id):
     """
