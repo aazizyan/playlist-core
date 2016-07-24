@@ -56,13 +56,13 @@ def add_place(connection, admin_username, place_name, latitude, longtitude):
     return place_id
 
 
-def add_song(connection, place_id, username, song_name):
+def add_song(connection, place_id, username, song_name, file):
     cursor = connection.cursor()
 
     cursor.execute("""INSERT
-                        INTO songs (place_id, username, song_name)
-                        VALUES (%s, %s, %s);""",
-                   (place_id, username, song_name))
+                        INTO songs (place_id, username, song_name, file)
+                        VALUES (%s, %s, %s, %s);""",
+                   (place_id, username, song_name, file))
     if cursor.rowcount == 0:
         return None
     cursor.execute("""SELECT currval('songs_song_id_seq')""")
@@ -187,12 +187,23 @@ def change_song_name(connection, song_id, new_name):
 
 def get_songs(connection, place_id):
     cursor = connection.cursor()
-    cursor.execute("""SELECT *
+    cursor.execute("""SELECT song_id, place_id, username, song_name, raiting
                         FROM songs
                         WHERE place_id = %s""",
                    (place_id,))
     songs_list = cursor.fetchall()
     return songs_list
+
+
+def get_song(connection, song_id):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT file
+                         FROM songs
+                         WHERE song_id = %s""",
+                   (song_id,))
+    if cursor.rowcount == 0:
+        return None
+    return cursor.fetchone[0]
 
 
 def get_places(connection):
