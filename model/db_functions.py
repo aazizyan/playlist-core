@@ -228,3 +228,7 @@ def validate_admin(connection, place_id, admin_username):
 
 def get_admin(place_id):
     pass
+
+
+def is_admin(username):
+    pass

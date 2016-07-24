@@ -6,7 +6,7 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, leave_room, join_room
 
 from blueprints import user_api, admin_api
-from model.db_functions import validate_token, get_admin
+from model.db_functions import validate_token, get_admin, is_admin
 from model.internal_config import DATABASE_CONNECTION, DATABASE_URL
 from model.utils import LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -20,15 +20,15 @@ app.register_blueprint(admin_api)
 uses_netloc.append("postgres")
 url = urlparse(DATABASE_URL)
 
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
-
-app.config[DATABASE_CONNECTION] = conn
+# conn = psycopg2.connect(
+#     database=url.path[1:],
+#     user=url.username,
+#     password=url.password,
+#     host=url.hostname,
+#     port=url.port
+# )
+#
+# app.config[DATABASE_CONNECTION] = conn
 
 socketio = SocketIO(app)
 
@@ -37,7 +37,7 @@ socketio = SocketIO(app)
 def handle_message(data):
     user = JsonObject(data)
     join_room(user.placeid)
-    if user.admin:
+    if is_admin(user.usename):
         join_room(user.username)
 
 
@@ -90,4 +90,4 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app)
+    socketio.run(app, host='192.168.0.106')
