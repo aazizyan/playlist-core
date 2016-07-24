@@ -151,8 +151,13 @@ def update_token(connection, username):
     return token
 
 
-def enter_place(connection, username, placeid):
-    pass
+def enter_place(connection, placeid):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT *
+                            FROM places
+                            WHERE place_id = %s""",
+                   (placeid,))
+    return cursor.rowcount() == 1
 
 
 def change_song_name(connection, song_id, new_name):
