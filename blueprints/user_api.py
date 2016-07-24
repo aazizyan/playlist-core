@@ -31,9 +31,9 @@ def get_connection():
     return current_app.config[DATABASE_CONNECTION]
 
 
-def check_auth(username):
+def check_auth(username, token):
     connection = get_connection()
-    return validate_token(connection, username, LEASE_TIME)
+    return validate_token(connection, token, username, LEASE_TIME)
 
 
 def authenticate():
@@ -44,7 +44,7 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         data = JsonObject(request.data.decode())
-        if not data or not check_auth(data.username):
+        if not data or not check_auth(data.username, data.token):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
@@ -83,7 +83,7 @@ def login_user():
     user = JsonObject(request.data.decode())
     username = user.username
     password = hash_password(username, user.password)
-    user_info = validate_user(connection, username, password)
+    user_info = validate_user(connection, user.token, username, password)
     if user_info:
         token = update_token(connection, user.username)
         response = response_user(user_info).add('token', token).to_string()
@@ -95,12 +95,12 @@ def login_user():
 def check_validity():
     connection = get_connection()
     user = JsonObject(request.data.decode())
-    response = BuilderDict()
-    # TODO return with response true "nick":"nickname", "admin":"is_admin", "placeid":"id"
-    if validate_token(connection, user.username, LEASE_TIME):
-        response.add("response", True)
+    response = None
+    user_info = validate_token(connection, user.token, user.username, LEASE_TIME)
+    if user_info:
+        response = response_user(user_info)
     else:
-        response.add("response", False)
+        response = BuilderDict().add("response", False)
     return response.to_string(), 200
 
 
@@ -114,7 +114,7 @@ def join_place(place_id):
     """
     connection = get_connection()
     user = JsonObject(request.data.decode())
-    if not validate_token(connection, user.username, LEASE_TIME):
+    if not validate_token(connection, user.token, user.username, LEASE_TIME):
         return BuilderDict.create_update_lease()
     if enter_place(connection, user.username, int(place_id)):
         return '', 200

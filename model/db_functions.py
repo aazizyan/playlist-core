@@ -120,21 +120,24 @@ def remove_song(connection, song_id):
     return True
 
 
-def validate_token(connection, username, lapse_time):
+def validate_token(connection, token, username, lapse_time):
     cursor = connection.cursor()
-    cursor.execute("""SELECT token_date
-                        FROM users
-                        WHERE username = %s and
-                              EXTRACT(EPOCH FROM now()) - %s <= token_date""",
-                    (username, lapse_time))
+    cursor.execute("""SELECT u.name, u.is_admin, p.place_id
+                        FROM users AS u LEFT OUTER JOIN
+                              places AS p ON u.username = p.username
+                        WHERE u.username = %s and
+                              u.token = %s and
+                              EXTRACT(EPOCH FROM now()) - %s <= u.token_date""",
+                    (username, token, lapse_time))
     if cursor.rowcount == 1:
+        user = cursor.fetchone()
         cursor.execute("""UPDATE users
                             SET token_date = EXTRACT(EPOCH FROM now())
                             WHERE username = %s""",
                        (username,))
         connection.commit()
-        return True
-    return False
+        return user
+    return None
 
 
 def update_token(connection, username):
