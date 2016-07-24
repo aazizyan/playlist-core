@@ -16,40 +16,40 @@ app.register_blueprint(admin_api)
 uses_netloc.append("postgres")
 url = urlparse(DATABASE_URL)
 
-# conn = psycopg2.connect(
-#     database=url.path[1:],
-#     user=url.username,
-#     password=url.password,
-#     host=url.hostname,
-#     port=url.port
-# )
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
+app.config[DATABASE_CONNECTION] = conn
+
+
+# socketio = SocketIO(app)
+
+
+# @socketio.on('connect')
+# def handle_message():
+#     print("connect")
 #
-# app.config[DATABASE_CONNECTION] = conn
-
-
-socketio = SocketIO(app)
-
-
-@socketio.on('connect')
-def handle_message():
-    print("connect")
-
-
-@socketio.on("faqfaq")
-def faq(data):
-    print(data)
-
-
-@socketio.on('like')
-def like(data):
-    print("like")
-    print(data)
-
-
-@socketio.on('leave')
-def leave(data):
-    print("leave")
-    print(data)
+#
+# @socketio.on("faqfaq")
+# def faq(data):
+#     print(data)
+#
+#
+# @socketio.on('like')
+# def like(data):
+#     print("like")
+#     print(data)
+#
+#
+# @socketio.on('leave')
+# def leave(data):
+#     print("leave")
+#     print(data)
 
 
 @app.errorhandler(AttributeError)
@@ -70,4 +70,5 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app)
+    app.run()
+    # socketio.run(app)
