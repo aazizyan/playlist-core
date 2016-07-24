@@ -224,3 +224,7 @@ def validate_admin(connection, place_id, admin_username):
     if cursor.rowcount == 0:
         return False
     return True
+
+
+def get_admin(place_id):
+    pass

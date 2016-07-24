@@ -6,7 +6,11 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, leave_room, join_room
 
 from blueprints import user_api, admin_api
+from model.db_functions import validate_token, get_admin
 from model.internal_config import DATABASE_CONNECTION, DATABASE_URL
+from model.utils import LEASE_TIME
+from objects.builder_dict import BuilderDict
+from objects.json_object import JsonObject
 
 app = Flask(__name__)
 
@@ -26,30 +30,46 @@ conn = psycopg2.connect(
 
 app.config[DATABASE_CONNECTION] = conn
 
+socketio = SocketIO(app)
 
-# socketio = SocketIO(app)
+
+@socketio.on('enter room')
+def handle_message(data):
+    user = JsonObject(data)
+    join_room(user.placeid)
+    if user.admin:
+        join_room(user.username)
 
 
-# @socketio.on('connect')
-# def handle_message():
-#     print("connect")
-#
-#
-# @socketio.on("faqfaq")
-# def faq(data):
-#     print(data)
-#
-#
-# @socketio.on('like')
-# def like(data):
-#     print("like")
-#     print(data)
-#
-#
-# @socketio.on('leave')
-# def leave(data):
-#     print("leave")
-#     print(data)
+@socketio.on('like')
+def like(data):
+    _like = JsonObject(data)
+    res = validate_token(app.config[DATABASE_CONNECTION],
+                         _like.token, _like.username, LEASE_TIME)
+    if res:
+        obj = BuilderDict()
+        obj.add('songid', _like.songid)
+        obj.add('like', _like.like)
+        emit('like', obj.to_string(), room=_like.placeid)
+
+
+@socketio.on('request song')
+def request_song(data):
+    req = JsonObject(data)
+    res = validate_token(app.config[DATABASE_CONNECTION],
+                         req.token, req.username, LEASE_TIME)
+    if res:
+        obj = BuilderDict()
+        obj.add('name', req.songname)
+        emit('request song', obj.to_string(), room=get_admin(req.placeid))
+
+
+@socketio.on('leave room')
+def leave(data):
+    user = JsonObject(data)
+    leave_room(user.placeid)
+    if user.admin:
+        leave_room(user.username)
 
 
 @app.errorhandler(AttributeError)
@@ -70,5 +90,4 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run()
-    # socketio.run(app)
+    socketio.run(app)
