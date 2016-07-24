@@ -22,6 +22,7 @@ CREATE TABLE songs(
 	place_id INT NOT NULL,
 	username varchar(50) NOT NULL,
 	song_name varchar(50),
+	raiting INT NOT NULL DEFAULT 0,
 	FOREIGN KEY (place_id) REFERENCES places(place_id),
 	FOREIGN KEY (username) REFERENCES users(username)
 );

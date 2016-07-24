@@ -78,9 +78,14 @@ def like_song(connection, username, song_id, _type):
                         WHERE   username = %s and
                                 song_id = %s""",
                    (username, song_id))
+    step = -1
+    if _type:
+        step = 1
 
     if cursor.rowcount > 0:
+        print("opa")
         like = cursor.fetchone()
+
         if like[3] == _type:
             return False
         else:
@@ -89,6 +94,11 @@ def like_song(connection, username, song_id, _type):
                                 WHERE username = %s and
                                       song_id = %s""",
                            (_type, username, song_id))
+            cursor.execute("""UPDATE songs
+                             SET  raiting = raiting + %s
+                             WHERE song_id = %s""",
+                           (step * 2, song_id))
+
             connection.commit()
             return True
 
@@ -96,6 +106,12 @@ def like_song(connection, username, song_id, _type):
                         INTO likes (username, song_id, type)
                         VALUES (%s, %s, %s);""",
                    (username, song_id, _type))
+
+    cursor.execute("""UPDATE songs
+                        SET  raiting = raiting + %s
+                        WHERE song_id = %s""",
+                   (step, song_id))
+
     if cursor.rowcount == 0:
         return False
     connection.commit()

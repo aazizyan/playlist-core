@@ -166,6 +166,19 @@ def donwload_song(place_id):
     return 'song song'
 
 
+def song_list_response(song_list):
+    dict_list = list()
+    for song in song_list:
+        temp_song_dict = BuilderDict()\
+            .add('songid', str(song[0]))\
+            .add('name', song[3])\
+            .add('placeid', str(song[1]))\
+            .add('raiting', song[4])
+        dict_list.append(temp_song_dict)
+
+    return dict_list
+
+
 @user_api.route('/<place_id>/songs')
 @requires_auth
 def get_list(place_id):
@@ -175,10 +188,23 @@ def get_list(place_id):
     :return:
     """
     connection = get_connection()
-    response = get_songs(connection, int(place_id))
-    if response:
+    song_list = get_songs(connection, int(place_id))
+    if song_list:
+        response = song_list_response(song_list)
         return json.dumps(response), 200
     return '', 404
+
+
+def places_list_response(places_list):
+    dict_list = list()
+    for place in places_list:
+        temp_palce_dict = BuilderDict().\
+            add('placeid', str(place[0])).\
+            add('name', place[2]).\
+            add('lat', place[3]).\
+            add('lon', place[4])
+        dict_list.append(temp_palce_dict)
+    return dict_list
 
 
 @user_api.route('/places/')
@@ -189,7 +215,8 @@ def get_places_list():
     :return:
     """
     connection = get_connection()
-    response = get_places_list(connection)
-    if response:
+    places_list = get_places_list(connection)
+    if places_list:
+        response = places_list_response(places_list)
         return json.dumps(response), 200
     return '', 404
