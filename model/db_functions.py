@@ -227,6 +227,25 @@ def validate_admin(connection, place_id, admin_username):
     return True
 
 
-def get_admin(place_id):
-    pass
+def get_admin(connection, place_id):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT u.username
+                        FROM  places AS p LEFT OUTER JOIN
+                              users AS u ON p.username = u.username
+                                WHERE p.place_id = %s""",
+                    (place_id, ))
+    if cursor.rowcount == 0:
+        return None
+    return cursor.fetchone[0]
+
+
+def is_adimn(connection, username):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT *
+                        FROM users AS u
+                        WHERE u.username = %s AND
+                              u.is_admin = TRUE;""",
+                   (username,))
+    return cursor.rowcount == 0
+
 
