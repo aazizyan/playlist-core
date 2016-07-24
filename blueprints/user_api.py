@@ -65,7 +65,7 @@ def create_user():
         response = response_token(token)
         if user.admin:
             place_id = add_place(connection, user.username,
-                                 user.place, user.lat, user.lon)
+                                 user.placename, user.lat, user.lon)
             if place_id is None:
                 return '', 404
             response.add('id', str(place_id))
@@ -207,7 +207,7 @@ def places_list_response(places_list):
     return dict_list
 
 
-@user_api.route('/places/')
+@user_api.route('/places')
 @requires_auth
 def get_places_list():
     """

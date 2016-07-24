@@ -3,6 +3,7 @@ from urllib.parse import uses_netloc, urlparse
 
 import psycopg2
 from flask import Flask
+from flask_socketio import SocketIO, emit, leave_room, join_room
 
 from blueprints import user_api, admin_api
 from model.internal_config import DATABASE_CONNECTION, DATABASE_URL
@@ -26,6 +27,24 @@ conn = psycopg2.connect(
 app.config[DATABASE_CONNECTION] = conn
 
 
+socketio = SocketIO(app)
+
+
+@socketio.on('connect')
+def handle_message(data):
+    print(data)
+
+
+@socketio.on('like')
+def like(data):
+    print(data)
+
+
+@socketio.on('leave')
+def leave(data):
+    print(data)
+
+
 @app.errorhandler(AttributeError)
 def err_handler(err):
     return err.message, 400
@@ -44,4 +63,4 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    socketio.run(app)
