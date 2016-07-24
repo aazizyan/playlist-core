@@ -95,7 +95,7 @@ def like_song(connection, username, song_id, _type):
                                       song_id = %s""",
                            (_type, username, song_id))
             cursor.execute("""UPDATE songs
-                             SET  raiting = raiting + %s
+                             SET  rating = rating + %s
                              WHERE song_id = %s""",
                            (step * 2, song_id))
 
@@ -108,7 +108,7 @@ def like_song(connection, username, song_id, _type):
                    (username, song_id, _type))
 
     cursor.execute("""UPDATE songs
-                        SET  raiting = raiting + %s
+                        SET  rating = rating + %s
                         WHERE song_id = %s""",
                    (step, song_id))
 
@@ -187,9 +187,10 @@ def change_song_name(connection, song_id, new_name):
 
 def get_songs(connection, place_id):
     cursor = connection.cursor()
-    cursor.execute("""SELECT song_id, place_id, username, song_name, raiting
+    cursor.execute("""SELECT song_id, place_id, username, song_name, rating
                         FROM songs
-                        WHERE place_id = %s""",
+                        WHERE place_id = %s
+                        ORDER BY rating DESC""",
                    (place_id,))
     songs_list = cursor.fetchall()
     return songs_list
