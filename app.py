@@ -36,10 +36,10 @@ def ping():
     return '', 200
 
 
-# @app.route('/db_test')
-# def db_test():
-#     connection = app.config[DATABASE_CONNECTION]
-#     return str(connection.closed), (200 if connection.closed == 0 else 404)
+@app.route('/db_test')
+def db_test():
+    connection = app.config[DATABASE_CONNECTION]
+    return str(connection.closed), (200 if connection.closed == 0 else 404)
 
 
 if __name__ == '__main__':
