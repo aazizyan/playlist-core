@@ -144,7 +144,7 @@ def validate_token(connection, token, username, lapse_time):
                         WHERE u.username = %s and
                               u.token = %s and
                               EXTRACT(EPOCH FROM now()) - %s <= u.token_date""",
-                    (username, token, lapse_time))
+                   (username, token, lapse_time))
     if cursor.rowcount == 1:
         user = cursor.fetchone()
         cursor.execute("""UPDATE users
@@ -190,7 +190,7 @@ def get_songs(connection, place_id):
     cursor.execute("""SELECT *
                         FROM songs
                         WHERE place_id = %s""",
-                    (place_id,))
+                   (place_id,))
     songs_list = cursor.fetchall()
     return songs_list
 
