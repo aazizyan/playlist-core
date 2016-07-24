@@ -179,7 +179,7 @@ def get_list(place_id):
     return '', 404
 
 
-@user_api.route('/places/')
+@user_api.route('/places')
 @requires_auth
 def get_places_list():
     """
