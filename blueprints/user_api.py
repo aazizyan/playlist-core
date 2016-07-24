@@ -98,7 +98,7 @@ def check_validity():
     response = None
     user_info = validate_token(connection, user.token, user.username, LEASE_TIME)
     if user_info:
-        response = response_user(user_info)
+        response = response_user(user_info).add("response", True)
     else:
         response = BuilderDict().add("response", False)
     return response.to_string(), 200
@@ -114,10 +114,12 @@ def join_place(place_id):
     """
     connection = get_connection()
     user = JsonObject(request.data.decode())
-    if not validate_token(connection, user.token, user.username, LEASE_TIME):
-        return BuilderDict.create_update_lease()
-    if enter_place(connection, user.username, int(place_id)):
-        return '', 200
+    try:
+        if enter_place(connection, int(place_id)):
+            return '', 200
+    except:
+        pass
+
     return '', 404
 
 
