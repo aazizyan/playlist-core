@@ -5,7 +5,7 @@ from flask import Blueprint, request, current_app, make_response
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -172,12 +172,12 @@ def donwload_song(songid):
 def song_list_response(song_list):
     dict_list = list()
     for song in song_list:
-        temp_song_dict = BuilderDict()\
-            .add('songid', str(song[0]))\
-            .add('name', song[3])\
-            .add('placeid', str(song[1]))\
-            .add('raiting', song[4])
-        dict_list.append(temp_song_dict)
+        temp_dict = dict()
+        temp_dict['songid'] = str(song[0])
+        temp_dict['name'] = song[3]
+        temp_dict['placeid'] = str(song[1])
+        temp_dict['rating'] = song[4]
+        dict_list.append(temp_dict)
 
     return dict_list
 

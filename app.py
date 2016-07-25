@@ -53,6 +53,12 @@ def like(data):
         emit('like', obj.to_string(), room=_like.placeid)
 
 
+@socketio.on('change song')
+def change_song(data):
+    song = JsonObject(data)
+    emit('change song', 'changed', room=song.placeid)
+
+
 @socketio.on('request song')
 def request_song(data):
     req = JsonObject(data)

@@ -187,10 +187,10 @@ def change_song_name(connection, song_id, new_name):
 
 def get_songs(connection, place_id):
     cursor = connection.cursor()
-    cursor.execute("""SELECT song_id, place_id, username, song_name, rating
+    cursor.execute("""SELECT song_id, place_id, username, song_name, raiting
                         FROM songs
                         WHERE place_id = %s
-                        ORDER BY rating DESC""",
+                        ORDER BY raiting DESC""",
                    (place_id,))
     songs_list = cursor.fetchall()
     return songs_list
