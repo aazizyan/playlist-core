@@ -20,15 +20,15 @@ app.register_blueprint(admin_api)
 uses_netloc.append("postgres")
 url = urlparse(DATABASE_URL)
 
-# conn = psycopg2.connect(
-#     database=url.path[1:],
-#     user=url.username,
-#     password=url.password,
-#     host=url.hostname,
-#     port=url.port
-# )
-#
-# app.config[DATABASE_CONNECTION] = conn
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
+app.config[DATABASE_CONNECTION] = conn
 
 socketio = SocketIO(app)
 

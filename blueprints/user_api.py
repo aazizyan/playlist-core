@@ -5,7 +5,7 @@ from flask import Blueprint, request, current_app, make_response
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -84,7 +84,7 @@ def login_user():
     user = JsonObject(request.data.decode())
     username = user.username
     password = hash_password(username, user.password)
-    user_info = validate_user(connection, user.token, username, password)
+    user_info = validate_user(connection, username, password)
     if user_info:
         token = update_token(connection, user.username)
         response = response_user(user_info).add('token', token).to_string()
@@ -182,7 +182,7 @@ def song_list_response(song_list):
     return dict_list
 
 
-@user_api.route('/<place_id>/songs')
+@user_api.route('/<place_id>/songs', methods=['POST'])
 def get_list(place_id):
     """
     Returns list of songs for given place id
@@ -200,24 +200,24 @@ def get_list(place_id):
 def places_list_response(places_list):
     dict_list = list()
     for place in places_list:
-        temp_palce_dict = BuilderDict().\
-            add('placeid', str(place[0])).\
-            add('name', place[2]).\
-            add('lat', place[3]).\
-            add('lon', place[4])
-        dict_list.append(temp_palce_dict)
+        temp_dict =  dict()
+        temp_dict['placeid'] =  str(place[0])
+        temp_dict['name'] = place[2]
+        temp_dict['lat'] = place[3]
+        temp_dict['lon'] = place[4]
+        dict_list.append(temp_dict)
     return dict_list
 
 
 @user_api.route('/places', methods=['POST'])
 @requires_auth
-def get_places_list():
+def get_place_list():
     """
     Returns list of places
     :return:
     """
     connection = get_connection()
-    places_list = get_places_list(connection)
+    places_list = get_places(connection)
     if places_list:
         response = places_list_response(places_list)
         return json.dumps(response), 200
