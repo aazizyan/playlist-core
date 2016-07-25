@@ -37,7 +37,7 @@ socketio = SocketIO(app)
 def handle_message(data):
     user = JsonObject(data)
     join_room(user.placeid)
-    if is_admin(user.usename):
+    if is_admin(app.config[DATABASE_CONNECTION], user.usename):
         join_room(user.username)
 
 
@@ -68,7 +68,7 @@ def request_song(data):
 def leave(data):
     user = JsonObject(data)
     leave_room(user.placeid)
-    if is_admin(user.usename):
+    if is_admin(app.config[DATABASE_CONNECTION], user.usename):
         leave_room(user.username)
 
 

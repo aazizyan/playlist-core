@@ -239,7 +239,7 @@ def get_admin(connection, place_id):
     return cursor.fetchone[0]
 
 
-def is_adimn(connection, username):
+def is_admin(connection, username):
     cursor = connection.cursor()
     cursor.execute("""SELECT *
                         FROM users AS u
