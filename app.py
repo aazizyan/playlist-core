@@ -68,7 +68,7 @@ def request_song(data):
 def leave(data):
     user = JsonObject(data)
     leave_room(user.placeid)
-    if user.admin:
+    if is_admin(user.usename):
         leave_room(user.username)
 
 

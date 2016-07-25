@@ -1,10 +1,11 @@
 import json
+import mimetypes
 
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request, current_app, make_response
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -152,9 +153,8 @@ def request_song(place_id):
     return 'request song'
 
 
-@user_api.route('/download/<place_id>/song', methods=['GET'])
-@requires_auth
-def donwload_song(place_id):
+@user_api.route('/download/<songid>', methods=['GET'])
+def donwload_song(songid):
     """
     User requests to download current playing song
     in given place.
@@ -162,8 +162,11 @@ def donwload_song(place_id):
     """
     # TODO handle request
     connection = get_connection()
-    song = JsonObject(request.data.decode())
-    return 'song song'
+    _bytes, name = get_song(connection, songid)
+    response = make_response(_bytes)
+    response.headers['Content-Type'] = 'audio/mpeg'
+    response.headers['Content-Disposition'] = 'filename="{}"'.format(name)
+    return response
 
 
 def song_list_response(song_list):
@@ -180,7 +183,6 @@ def song_list_response(song_list):
 
 
 @user_api.route('/<place_id>/songs')
-@requires_auth
 def get_list(place_id):
     """
     Returns list of songs for given place id
@@ -207,7 +209,7 @@ def places_list_response(places_list):
     return dict_list
 
 
-@user_api.route('/places')
+@user_api.route('/places', methods=['POST'])
 @requires_auth
 def get_places_list():
     """

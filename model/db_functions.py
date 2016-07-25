@@ -247,8 +247,3 @@ def is_adimn(connection, username):
                               u.is_admin = TRUE;""",
                    (username,))
     return cursor.rowcount == 0
-
-
-
-def is_admin(username):
-    pass

@@ -46,12 +46,14 @@ def new_song(place_id):
     """
     connection = get_connection()
     song = JsonObject(request.data.decode())
-    if not validate_token(connection, song.username, LEASE_TIME):
+    if not validate_token(connection, song.token, song.username, LEASE_TIME):
         return BuilderDict.create_update_lease()
-    song_id = add_song(connection, place_id, song.username, song.songid)
-    if song_id:
-        response = BuilderDict()
-        return response.add('id', str(song_id)).to_string(), 200
+    if 'file' in request.files:
+        _file = request.files['file']
+        song_id = add_song(connection, place_id, song.token, song.username, _file.read())
+        if song_id:
+            response = BuilderDict()
+            return response.add('id', str(song_id)).to_string(), 200
     return '', 404
 
 
