@@ -198,13 +198,13 @@ def get_songs(connection, place_id):
 
 def get_song(connection, song_id):
     cursor = connection.cursor()
-    cursor.execute("""SELECT file
-                         FROM songs
+    cursor.execute("""SELECT s.file, s.song_name
+                         FROM songs AS s
                          WHERE song_id = %s""",
                    (song_id,))
     if cursor.rowcount == 0:
         return None
-    return cursor.fetchone[0]
+    return cursor.fetchone
 
 
 def get_places(connection):
