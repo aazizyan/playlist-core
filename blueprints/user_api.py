@@ -163,7 +163,7 @@ def donwload_song(songid):
     # TODO handle request
     connection = get_connection()
     _bytes, name = get_song(connection, songid)
-    response = make_response(_bytes)
+    response = make_response(bytes(_bytes))
     response.headers['Content-Type'] = 'audio/mpeg'
     response.headers['Content-Disposition'] = 'filename="{}"'.format(name)
     return response

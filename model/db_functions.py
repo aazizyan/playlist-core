@@ -204,7 +204,7 @@ def get_song(connection, song_id):
                    (song_id,))
     if cursor.rowcount == 0:
         return None
-    return cursor.fetchone
+    return cursor.fetchone()
 
 
 def get_places(connection):
