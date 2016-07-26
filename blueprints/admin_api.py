@@ -1,7 +1,7 @@
 from flask import Blueprint, request, current_app
 from six import wraps
 
-from model.db_functions import add_song, change_song_name, remove_song, validate_token
+from model.db_functions import add_song, change_song_name, remove_song, validate_token, drop_rating
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -93,3 +93,15 @@ def delete_song(place_id):
     if remove_song(connection, song.songid):
         return '', 200
     return '', 404
+
+
+@admin_api.route('/<song_id>', methods=['POST'])
+# @requires_auth
+# @requires_admin_auth
+def drop_song_rating(song_id):
+    connection = get_connection()
+    try:
+        drop_rating(connection, int(song_id))
+    except:
+        return '', 404
+    return '', 200

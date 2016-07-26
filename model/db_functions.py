@@ -247,3 +247,18 @@ def is_admin(connection, username):
                               u.is_admin = TRUE;""",
                    (username,))
     return cursor.rowcount == 0
+
+
+def drop_rating(connection, song_id):
+    cursor = connection.cursor()
+    cursor.execute("""DELETE
+                        FROM likes AS l
+                        WHERE l.song_id = %s""",
+                   (song_id, ))
+
+    cursor.execute("""UPDATE songs AS s
+                         SET s.rating = 0
+                         WHERE s.song_id = %s""",
+                   (song_id,))
+
+
