@@ -6,7 +6,7 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, leave_room, join_room
 
 from blueprints import user_api, admin_api
-from model.db_functions import validate_token, get_admin, is_admin
+from model.db_functions import validate_token, get_admin, is_admin, like_song
 from model.internal_config import DATABASE_CONNECTION, DATABASE_URL
 from model.utils import LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -37,7 +37,7 @@ socketio = SocketIO(app)
 def handle_message(data):
     user = JsonObject(data)
     join_room(user.placeid)
-    if is_admin(app.config[DATABASE_CONNECTION], user.usename):
+    if is_admin(app.config[DATABASE_CONNECTION], user.username):
         join_room(user.username)
 
 
@@ -46,6 +46,8 @@ def like(data):
     _like = JsonObject(data)
     res = validate_token(app.config[DATABASE_CONNECTION],
                          _like.token, _like.username, LEASE_TIME)
+    if res:
+        res = like_song(app.config[DATABASE_CONNECTION], _like.username, _like.songid, _like.like)
     if res:
         obj = BuilderDict()
         obj.add('songid', _like.songid)
@@ -67,14 +69,14 @@ def request_song(data):
     if res:
         obj = BuilderDict()
         obj.add('name', req.songname)
-        emit('request song', obj.to_string(), room=get_admin(req.placeid))
+        emit('request song', obj.to_string(), room=get_admin(app.config[DATABASE_CONNECTION], req.placeid))
 
 
 @socketio.on('leave room')
 def leave(data):
     user = JsonObject(data)
     leave_room(user.placeid)
-    if is_admin(app.config[DATABASE_CONNECTION], user.usename):
+    if is_admin(app.config[DATABASE_CONNECTION], user.username):
         leave_room(user.username)
 
 
@@ -96,4 +98,4 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='192.168.0.106')
+    socketio.run(app, host='192.168.43.219')

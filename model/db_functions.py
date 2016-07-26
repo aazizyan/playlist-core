@@ -95,7 +95,7 @@ def like_song(connection, username, song_id, _type):
                                       song_id = %s""",
                            (_type, username, song_id))
             cursor.execute("""UPDATE songs
-                             SET  rating = rating + %s
+                             SET  raiting = raiting + %s
                              WHERE song_id = %s""",
                            (step * 2, song_id))
 
@@ -108,7 +108,7 @@ def like_song(connection, username, song_id, _type):
                    (username, song_id, _type))
 
     cursor.execute("""UPDATE songs
-                        SET  rating = rating + %s
+                        SET  raiting = raiting + %s
                         WHERE song_id = %s""",
                    (step, song_id))
 
@@ -169,11 +169,12 @@ def update_token(connection, username):
 
 def enter_place(connection, placeid):
     cursor = connection.cursor()
+    print(placeid)
     cursor.execute("""SELECT *
                             FROM places
                             WHERE place_id = %s""",
                    (placeid,))
-    return cursor.rowcount() == 1
+    return cursor.rowcount == 1
 
 
 def change_song_name(connection, song_id, new_name):
