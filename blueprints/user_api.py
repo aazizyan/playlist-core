@@ -5,7 +5,7 @@ from flask import Blueprint, request, current_app, make_response
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song, is_admin
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -117,7 +117,10 @@ def join_place(place_id):
     user = JsonObject(request.data.decode())
     try:
         if enter_place(connection, int(place_id)):
-            return '', 200
+            resp = BuilderDict()
+            resp.add("isadmin", is_admin(connection, user.username))
+            resp.add("placeid", place_id)
+            return resp.to_string(), 200
     except:
         pass
 
@@ -190,6 +193,7 @@ def get_list(place_id):
     :return:
     """
     connection = get_connection()
+    # add_song(connection, "4", 'pppp', 'asd.mp3', open('/home/misho/PycharmProjects/playlist-core/asd.mp3', 'rb').read())
     song_list = get_songs(connection, int(place_id))
     if song_list:
         response = song_list_response(song_list)
@@ -218,6 +222,8 @@ def get_place_list():
     """
     connection = get_connection()
     places_list = get_places(connection)
+
+    # add_song(connection, "4", 'pppp', 'asd.mp3', open('/home/misho/PycharmProjects/playlist-core/asd.mp3', 'rb').read())
     if places_list:
         response = places_list_response(places_list)
         return json.dumps(response), 200
