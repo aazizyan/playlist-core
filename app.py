@@ -44,7 +44,8 @@ def handle_message(data):
 @socketio.on('update msg')
 def update_list(data):
     user = JsonObject(data)
-    emit("change song", "", room=user.placeid)
+    tempDict = BuilderDict().add('songid', user.songid)
+    emit("change song", tempDict.to_string(), room=user.placeid)
 
 
 @socketio.on('like')
