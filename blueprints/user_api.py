@@ -1,11 +1,12 @@
 import json
 import mimetypes
 
-from flask import Blueprint, request, current_app, make_response
+from flask import Blueprint, request, current_app, make_response, redirect
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song, is_admin
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song, is_admin, \
+    place_location
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -228,3 +229,17 @@ def get_place_list():
         response = places_list_response(places_list)
         return json.dumps(response), 200
     return '', 404
+
+
+@user_api.route('/share/<place_id>', methods=['GET'])
+@requires_auth
+def share_location(place_id):
+    connection = get_connection()
+    try:
+        location = place_location(connection, int(place_id))
+        if location:
+            url = 'http://maps.google.com/maps?daddr={0},{1}'.format(str(location[0]), str(location[1]))
+            return redirect(url, code=302)
+    except:
+        pass
+    return '', 44

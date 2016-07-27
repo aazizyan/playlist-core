@@ -235,7 +235,7 @@ def get_admin(connection, place_id):
                     (place_id, ))
     if cursor.rowcount == 0:
         return None
-    return cursor.fetchone[0]
+    return cursor.fetchone()[0]
 
 
 def is_admin(connection, username):
@@ -245,7 +245,7 @@ def is_admin(connection, username):
                         WHERE u.username = %s AND
                               u.is_admin = TRUE;""",
                    (username,))
-    return cursor.rowcount == 0
+    return cursor.rowcount == 1
 
 
 def drop_rating(connection, song_id):
@@ -261,3 +261,12 @@ def drop_rating(connection, song_id):
                    (song_id,))
 
 
+def place_location(connection, place_id):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT p.latitude, p.longitude
+                        FROM places AS p
+                        WHERE p.place_id = %s""",
+                   (place_id,))
+    if cursor.rowcount == 0:
+        return None
+    return cursor.fetchone()
