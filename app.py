@@ -75,9 +75,10 @@ def request_song(data):
     res = validate_token(app.config[DATABASE_CONNECTION],
                          req.token, req.username, LEASE_TIME)
     if res:
+        admin = get_admin(app.config[DATABASE_CONNECTION], req.placeid)
         obj = BuilderDict()
         obj.add('name', req.songname)
-        emit('request song', obj.to_string(), room=get_admin(app.config[DATABASE_CONNECTION], req.placeid))
+        emit('request song', obj.to_string(), room=admin)
 
 
 @socketio.on('leave room')
