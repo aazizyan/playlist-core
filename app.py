@@ -44,7 +44,8 @@ def handle_message(data):
 @socketio.on('update msg')
 def update_list(data):
     user = JsonObject(data)
-    tempDict = BuilderDict().add('songid', user.songid)
+    tempDict = BuilderDict().add('songid', user.songid).\
+        add('songname', user.songname)
     emit("change song", tempDict.to_string(), room=user.placeid)
 
 
