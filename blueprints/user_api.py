@@ -232,7 +232,6 @@ def get_place_list():
 
 
 @user_api.route('/share/<place_id>', methods=['GET'])
-@requires_auth
 def share_location(place_id):
     connection = get_connection()
     try:
