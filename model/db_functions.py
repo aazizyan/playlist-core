@@ -261,3 +261,12 @@ def drop_rating(connection, song_id):
                    (song_id,))
 
 
+def place_location(connection, place_id):
+    cursor = connection.cursor()
+    cursor.execute("""SELECT p.latitude, p.longitude
+                        FROM places AS p
+                        WHERE p.place_id = %s""",
+                   (place_id,))
+    if cursor.rowcount == 0:
+        return None
+    return cursor.fetchone()
