@@ -83,7 +83,6 @@ def like_song(connection, username, song_id, _type):
         step = 1
 
     if cursor.rowcount > 0:
-        print("opa")
         like = cursor.fetchone()
 
         if like[3] == _type:
@@ -169,7 +168,6 @@ def update_token(connection, username):
 
 def enter_place(connection, placeid):
     cursor = connection.cursor()
-    print(placeid)
     cursor.execute("""SELECT *
                             FROM places
                             WHERE place_id = %s""",
@@ -257,9 +255,9 @@ def drop_rating(connection, song_id):
                         WHERE l.song_id = %s""",
                    (song_id, ))
 
-    cursor.execute("""UPDATE songs AS s
-                         SET s.rating = 0
-                         WHERE s.song_id = %s""",
+    cursor.execute("""UPDATE songs
+                         SET raiting = 0
+                         WHERE song_id = %s""",
                    (song_id,))
 
 

@@ -1,7 +1,7 @@
 from hashlib import sha256
 
 
-LEASE_TIME = 4800
+LEASE_TIME = 480000
 
 
 def hash_password(username, password):

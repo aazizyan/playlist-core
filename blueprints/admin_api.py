@@ -104,6 +104,7 @@ def drop_song_rating(song_id):
     connection = get_connection()
     try:
         drop_rating(connection, int(song_id))
-    except:
+    except Exception as e:
+        print(e)
         return '', 404
     return '', 200
