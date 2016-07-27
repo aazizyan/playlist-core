@@ -41,6 +41,12 @@ def handle_message(data):
         join_room(user.username)
 
 
+@socketio.on('update msg')
+def update_list(data):
+    user = JsonObject(data)
+    emit("change song", "", room=user.placeid)
+
+
 @socketio.on('like')
 def like(data):
     _like = JsonObject(data)
