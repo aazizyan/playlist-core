@@ -1,12 +1,11 @@
 import json
-import mimetypes
 
 from flask import Blueprint, request, current_app, make_response, redirect
 from six import wraps
 
 from model.db_functions import validate_user, add_user, \
-    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, add_song, is_admin, \
-    place_location
+    add_place, enter_place, like_song, get_songs, update_token, validate_token, get_song, get_places, is_admin, \
+    place_location, get_admin
 from model.internal_config import DATABASE_CONNECTION
 from model.utils import hash_password, LEASE_TIME
 from objects.builder_dict import BuilderDict
@@ -49,6 +48,7 @@ def requires_auth(f):
         if not data or not check_auth(data.username, data.token):
             return authenticate()
         return f(*args, **kwargs)
+
     return decorated
 
 
@@ -142,21 +142,6 @@ def send_like_song():
     return '', 404
 
 
-@user_api.route('/<place_id>', methods=['POST'])
-@requires_auth
-def request_song(place_id):
-    """
-    User sends request to add
-    new song in current playlist
-    :param place_id: unique place id
-    """
-    # TODO handle request
-    connection = get_connection()
-    song = JsonObject(request.data.decode())
-
-    return 'request song'
-
-
 @user_api.route('/download/<songid>', methods=['GET'])
 def donwload_song(songid):
     """
@@ -205,8 +190,8 @@ def get_list(place_id):
 def places_list_response(places_list):
     dict_list = list()
     for place in places_list:
-        temp_dict =  dict()
-        temp_dict['placeid'] =  str(place[0])
+        temp_dict = dict()
+        temp_dict['placeid'] = str(place[0])
         temp_dict['name'] = place[2]
         temp_dict['lat'] = place[3]
         temp_dict['lon'] = place[4]
@@ -241,3 +226,33 @@ def share_location(place_id):
     except:
         pass
     return '', 44
+
+
+@user_api.route('/like', methods=['POST'])
+def like_song():
+    _like = JsonObject(request.data)
+    res = validate_token(current_app.config[DATABASE_CONNECTION],
+                         _like.token, _like.username, LEASE_TIME)
+    if res:
+        like_song(current_app.config[DATABASE_CONNECTION], _like.username, _like.songid, _like.like)
+        return '', 200
+    return '', 400
+
+
+@user_api.route('/songs', methods=['POST'])
+def request_song():
+    """
+    request song
+    :param data:
+    :return:
+    """
+    req = JsonObject(request.data)
+    res = validate_token(current_app.config[DATABASE_CONNECTION],
+                         req.token, req.username, LEASE_TIME)
+    if res:
+        # TODO request for admin
+        get_admin(current_app.config[DATABASE_CONNECTION], req.placeid)
+        return ''
+    return '', 400
+
+# TODO add update method
