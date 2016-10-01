@@ -107,4 +107,4 @@ def db_test():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='192.168.43.219')
+    socketio.run(app, host='192.168.1.197')

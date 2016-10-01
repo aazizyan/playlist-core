@@ -224,7 +224,6 @@ def get_place_list():
     connection = get_connection()
     places_list = get_places(connection)
 
-    # add_song(connection, "4", 'pppp', 'asd.mp3', open('/home/misho/PycharmProjects/playlist-core/asd.mp3', 'rb').read())
     if places_list:
         response = places_list_response(places_list)
         return json.dumps(response), 200
